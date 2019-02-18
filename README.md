@@ -52,7 +52,7 @@ module.exports = {
 }
 ```
 
-You should put these (or something similar) in your code, if you wan to use them (especially `DateTime` which I automatically use for `createdAt` and `updatedAt`.)
+You should put these (or something similar) in your code, if you want to use them (especially `DateTime` which I automatically use for `createdAt` and `updatedAt`.)
 
 ### example
 
@@ -121,6 +121,8 @@ EOF > resolvers/scalars.js
 
 # define your first type
 echo <<< EOF
+# import DateTime from "scalars.graphql"
+
 type Thing {
   id: ID!
   
@@ -217,4 +219,4 @@ This will resolve everything, and has an unexposed function `_setup` that will a
 
 ### building your server
 
-**TODO**: put apollo-server-expree & merge-graphql-schemas instructions here
+**TODO**: put apollo-server-expree & graphql-import instructions here
