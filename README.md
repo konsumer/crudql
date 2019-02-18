@@ -7,7 +7,7 @@ I wanted a simple way to build CRUD GraphQL APIs and frontends.
 If you want to install it globally:
 
 ```bash
-npm i -g crudql
+npm i -g @crudql/cli
 ``` 
 
 If you want to use it without installing, just replace all uses of `crudql` with `npx crudql`.
@@ -79,6 +79,8 @@ type Thing {
 This is the full type definition, but `createdAt` and `updatedAt` are special, and will be set in the resolvers, on the server-side. `id: ID!` is required for models to reference each other.
 
 
+#### boilerplate
+
 Let's get our project all setup for ourselves:
 
 ```bash
@@ -86,7 +88,7 @@ Let's get our project all setup for ourselves:
 npm init -y
 
 # install some deps we will be using for the server
-npm i -S crudql-resolvers-dynamo express merge-graphql-schemas apollo-server-express
+npm i -S graphql-custom-types graphql-type-json @crudql/dynamo express apollo-server-express lodash.merge
 
 # your typeDefs will go here
 mkdir schema
@@ -142,6 +144,7 @@ EOF > schema/thing.graphql
 
 ```
 
+#### making the CRUD
 
 So first, I want to generate some CRUD schema definition:
 
@@ -152,6 +155,8 @@ crudql schema schema/thing.graphql Thing > schema/thing_crud.graphql
 Which will make a file that looks like this:
 
 ```graphql
+# import Thing from "thing.graphql"
+
 type Query {
   # Get all Things.
   listThings(pageStart: Int = 0, pageSize: Int = 100): [Thing]!
@@ -190,33 +195,80 @@ crudql dynamo schema/thing.graphql Thing > resolvers/thing.js
 Which will make a file that looks like this:
 
 ```js
+const { list, get, update, create, setup } = require('@crudql/dynamo')
+
 module.exports = {
   Query: {
-    listThings: (current, args, context, info) => {
-      // TODO: once I work it out
-    },
-
-    getThing: (current, args, context, info) => {
-      // TODO: once I work it out
-    }
+    listThings: list,
+    getThing: get
   },
   Mutation: {
-    updateThing: (current, args, context, info) => {
-      // TODO: once I work it out
-    },
-
-    createThing: (current, args, context, info) => {
-      // TODO: once I work it out
-    }
+    updateThing: update,
+    createThing: create
   },
-  _setup: () => {
-    // TODO: setup the actual models & indexes on dynamo here
-  }
+  
+  _setup: setup
 }
 ```
 
-This will resolve everything, and has an unexposed function `_setup` that will actually set the model & it's indexes up for you, on Dynamo.
+This will resolve everything, and has an unexposed function `_setup` that will actually set the model & it's indexes up for you, on Dynamo. You can use `@crudql/dynamo` functions in your own resolvers, if you want, too:
 
-### building your server
+```js
+const { list, get, update, create, setup } = require('@crudql/dynamo')
 
-**TODO**: put apollo-server-expree & graphql-import instructions here
+module.exports = {
+  Query: {
+    listThings: async (current, args, context, info) => {
+      const things = await list(current, args, context, info)
+      // do stuff to things
+      return things
+    },
+    getThing: get
+  },
+  Mutation: {
+    updateThing: update,
+    createThing: create
+  },
+  
+  _setup: setup({ name: 'Things', indexes: [] })
+}
+```
+
+#### creating the server
+
+Now that you have your CRUD all setup, you can make a server that looks like this in `index.js`:
+
+```js
+const { importSchema } = require('graphql-import')
+const express = require('express')
+const { ApolloServer } = require('apollo-server-express')
+const merge = require('lodash.merge')
+
+const resolversThing = require('./resolvers/thing')
+const typeDefs = importSchema('./schema/thing_crud.graphql')
+
+const resolvers = merge({}, resolversThing)
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  introspection: true,
+  playground: true
+})
+
+const app = express()
+server.applyMiddleware({ app })
+module.exports = app
+
+app.listen(3000)
+
+```
+
+Run your server:
+
+```bash
+node index.js
+```
+
+Now, you can visit your server at [http://localhost:3000/graphql](http://localhost:3000/graphql).
+
