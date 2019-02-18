@@ -1,4 +1,5 @@
 const { pluralize } = require('inflection')
+const { basename } = require('path')
 
 // TODO: this could probly be simplified
 const getInputFields = (type, passRequired) => {
@@ -50,8 +51,10 @@ const getInputFields = (type, passRequired) => {
   }).join('\n  ')
 }
 
-module.exports = type => {
+module.exports = (type, file) => {
   return `
+# import ${type.name} from "${file ? basename(file) : type.name.toLowerCase() + '.graphql'}"
+
 type Query {
   # Get all ${pluralize(type.name)}.
   list${pluralize(type.name)}(pageStart: Int = 0, pageSize: Int = 100): [${type.name}]!

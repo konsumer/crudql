@@ -11,7 +11,7 @@ const argv = yargs
   .command('schema <file> [model]', 'Generate GraphQL schema for basic CRUD', yargs => {}, async argv => {
     const { model, file } = argv
     const type = await getType(file, model)
-    console.log(schemaCommand(type))
+    console.log(schemaCommand(type, file))
   })
   .command('dynamo [file] [model]', 'Generate DynamoDB resolvers for basic CRUD schema', yargs => {})
 

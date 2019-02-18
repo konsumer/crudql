@@ -1,11 +1,8 @@
 {
   "name": "crudql",
+  "private": true,
   "version": "0.0.0",
-  "description": "I wanted a simple way to build CRUD GraphQL APIs and frontends.",
-  "main": "index.js",
-  "directories": {
-    "example": "example"
-  },
+  "description": "Simple way to build CRUD GraphQL APIs and frontends.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

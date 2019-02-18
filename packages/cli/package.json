@@ -19,7 +19,11 @@
     "type": "git",
     "url": "git+https://github.com/konsumer/crudql.git"
   },
-  "keywords": ["graphql", "generate", "dynamodb"],
+  "keywords": [
+    "graphql",
+    "generate",
+    "dynamodb"
+  ],
   "author": "David Konsumer <konsumer@jetboystudio.com> (http://konsumer.js.org)",
   "license": "MIT",
   "bugs": {
