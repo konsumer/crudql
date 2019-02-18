@@ -25,7 +25,7 @@ crudql --help
 
 ### scalars
 
-I have a few scalars you will need to add to your schema somewhere, if you want to use them:
+I have a few useful scalars you should probly add to your server:
 
 ```graphql
 scalar Json
@@ -52,7 +52,7 @@ module.exports = {
 }
 ```
 
-You should put these (or soemthing similar) in your code, if you wan tto use them (especially `DateTime` which I automatically use for `createdAt` and `updatedAt`.)
+You should put these (or something similar) in your code, if you wan to use them (especially `DateTime` which I automatically use for `createdAt` and `updatedAt`.)
 
 ### example
 
