@@ -1,0 +1,13 @@
+{
+  "name": "modelmaker",
+  "version": "0.0.0",
+  "dependencies": {
+    "graphql": "^14.1.1",
+    "inflection": "^1.12.0",
+    "yargs": "^13.2.1"
+  },
+  "bin": {
+    "crudql": "crudql.js"
+  },
+  "main": "index.js"
+}

@@ -1,0 +1,18 @@
+# see README, but this is a basic scalar I use to represent a timestamp
+scalar DateTime
+
+type Thing {
+  id: ID!
+  
+  # the title of this Thing
+  title: String!
+  
+  # extra info about this Thing
+  extraInfo: String
+
+  # when was this created?
+  createdAt: DateTime!
+
+  # when was this last updated?
+  updatedAt: DateTime!
+}
