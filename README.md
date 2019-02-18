@@ -78,6 +78,8 @@ type Thing {
 
 This is the full type definition, but `createdAt` and `updatedAt` are special, and will be set in the resolvers, on the server-side. `id: ID!` is required for models to reference each other.
 
+Let's make a directory called `schema` and `resolvers` and put this in `schema/thing.graphql`.
+
 
 So first, I want to generate some CRUD schema definition:
 
