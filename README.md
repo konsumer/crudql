@@ -10,7 +10,7 @@ If you want to install it globally:
 npm i -g @crudql/cli
 ``` 
 
-If you want to use it without installing, just replace all uses of `crudql` with `npx crudql`.
+If you want to use it without installing, just replace all uses of `crudql` with `npx  @crudql/cli`, in instructions below.
 
 ## usage
 
@@ -88,7 +88,7 @@ Let's get our project all setup for ourselves:
 npm init -y
 
 # install some deps we will be using for the server
-npm i -S graphql-custom-types graphql-type-json @crudql/dynamo express apollo-server-express lodash.merge
+npm i -S graphql-custom-types graphql-type-json @crudql/dynamo express apollo-server-express
 
 # your typeDefs will go here
 mkdir schema
@@ -207,7 +207,7 @@ module.exports = {
     createThing: create
   },
   
-  _setup: setup
+  _setup: setup({ name: 'Things', indexes: [] })
 }
 ```
 
@@ -242,12 +242,9 @@ Now that you have your CRUD all setup, you can make a server that looks like thi
 const { importSchema } = require('graphql-import')
 const express = require('express')
 const { ApolloServer } = require('apollo-server-express')
-const merge = require('lodash.merge')
 
-const resolversThing = require('./resolvers/thing')
+const resolvers = require('./resolvers/thing')
 const typeDefs = importSchema('./schema/thing_crud.graphql')
-
-const resolvers = merge({}, resolversThing)
 
 const server = new ApolloServer({
   typeDefs,
@@ -271,4 +268,6 @@ node index.js
 ```
 
 Now, you can visit your server at [http://localhost:3000/graphql](http://localhost:3000/graphql).
+
+### TODO: explain lodash.merge and merge-graphql-schemas for stitching together multiple resolvers & typeDefs
 
