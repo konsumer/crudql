@@ -1,13 +1,29 @@
 {
-  "name": "modelmaker",
+  "name": "crudql",
   "version": "0.0.0",
+  "description": "Simple way to build CRUD GraphQL APIs and frontends.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
   "dependencies": {
     "graphql": "^14.1.1",
     "inflection": "^1.12.0",
     "yargs": "^13.2.1"
   },
-  "bin": {
-    "crudql": "crudql.js"
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "main": "index.js"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/konsumer/crudql.git"
+  },
+  "keywords": ["graphql", "generate", "dynamodb"],
+  "author": "David Konsumer <konsumer@jetboystudio.com> (http://konsumer.js.org)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/konsumer/crudql/issues"
+  },
+  "homepage": "https://github.com/konsumer/crudql#readme"
 }
