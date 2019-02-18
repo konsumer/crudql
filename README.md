@@ -78,7 +78,67 @@ type Thing {
 
 This is the full type definition, but `createdAt` and `updatedAt` are special, and will be set in the resolvers, on the server-side. `id: ID!` is required for models to reference each other.
 
-Let's make a directory called `schema` and `resolvers` and put this in `schema/thing.graphql`.
+
+Let's get our project all setup for ourselves:
+
+```bash
+# basic npm project
+npm init -y
+
+# install some deps we will be using for the server
+npm i -S crudql-resolvers-dynamo express merge-graphql-schemas apollo-server-express
+
+# your typeDefs will go here
+mkdir schema
+
+# your resolvers will go here
+mkdir resolvers
+
+# your basic scalar typeDefs
+echo <<< EOF
+scalar Json
+scalar DateTime
+scalar Email
+scalar URL
+EOF > schema/scalars.graphql
+
+# your basic scalar resolvers
+echo <<< EOF
+const JSONType = require('graphql-type-json')
+const {
+  GraphQLEmail,
+  GraphQLURL,
+  GraphQLDateTime
+} = require('graphql-custom-types')
+
+module.exports = {
+  Json: JSONType,
+  DateTime: GraphQLDateTime,
+  Email: GraphQLEmail,
+  URL: GraphQLURL
+}
+EOF > resolvers/scalars.js
+
+# define your first type
+echo <<< EOF
+type Thing {
+  id: ID!
+  
+  # the title of this Thing
+  title: String!
+  
+  # extra info about this Thing
+  extraInfo: String
+
+  # when was this created?
+  createdAt: DateTime!
+
+  # when was this last updated?
+  updatedAt: DateTime!
+}
+EOF > schema/thing.graphql
+
+```
 
 
 So first, I want to generate some CRUD schema definition:
@@ -157,4 +217,4 @@ This will resolve everything, and has an unexposed function `_setup` that will a
 
 ### building your server
 
-**TODO**: put apollo-server instructions here
+**TODO**: put apollo-server-expree & merge-graphql-schemas instructions here
