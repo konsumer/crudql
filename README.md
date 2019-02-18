@@ -255,8 +255,6 @@ const server = new ApolloServer({
 
 const app = express()
 server.applyMiddleware({ app })
-module.exports = app
-
 app.listen(3000)
 
 ```
