@@ -259,6 +259,22 @@ app.listen(3000)
 
 ```
 
+#### setup
+
+Make yourself a lil setup tool in `setup.js`:
+
+```js
+const { _setup } = require('./resolvers/thing')
+
+_setup()
+```
+
+Run your setup tool to build your structure in dynamodb:
+
+```bash
+node setup.js
+```
+
 Run your server:
 
 ```bash
