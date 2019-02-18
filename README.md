@@ -131,24 +131,29 @@ Which will make a file that looks like this:
 module.exports = {
   Query: {
     listThings: (current, args, context, info) => {
-      // TODO once I work it out
+      // TODO: once I work it out
     },
 
     getThing: (current, args, context, info) => {
-      // TODO once I work it out
+      // TODO: once I work it out
     }
   },
   Mutation: {
     updateThing: (current, args, context, info) => {
-      // TODO once I work it out
+      // TODO: once I work it out
     },
 
     createThing: (current, args, context, info) => {
-      // TODO once I work it out
+      // TODO: once I work it out
     }
+  },
+  _setup: () => {
+    // TODO: setup the actual models & indexes on dynamo here
   }
 }
 ```
+
+This will resolve everything, and has an unexposed function `_setup` that will actually set the model & it's indexes up for you, on Dynamo.
 
 ### building your server
 
