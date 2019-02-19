@@ -4,6 +4,7 @@ const yargs = require('yargs')
 
 const { getType } = require('./lib/utils')
 const schemaCommand = require('./lib/schema')
+const dynamoCommand = require('./lib/dynamo')
 
 const argv = yargs
   .usage('Usage: $0 <command> [options]')
@@ -13,6 +14,9 @@ const argv = yargs
     const type = await getType(file, model)
     console.log(schemaCommand(type, file))
   })
-  .command('dynamo [file] [model]', 'Generate DynamoDB resolvers for basic CRUD schema', yargs => {})
-
+  .command('dynamo [file] [model]', 'Generate DynamoDB resolvers for basic CRUD schema', yargs => {}, async argv => {
+    const { model, file } = argv
+    const type = await getType(file, model)
+    console.log(dynamoCommand(type, file))
+  })
   .argv

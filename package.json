@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "Simple way to build CRUD GraphQL APIs and frontends.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "publish": "npx lerna publish"
   },
   "repository": {
     "type": "git",
