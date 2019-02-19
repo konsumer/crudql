@@ -51,8 +51,7 @@ const getInputFields = (type, passRequired) => {
   }).join('\n  ')
 }
 
-module.exports = (type, file) => `
-# import ${type.name} from "${file ? basename(file) : type.name.toLowerCase() + '.graphql'}"
+module.exports = (type, file) => `# import ${type.name} from "${file ? basename(file) : type.name.toLowerCase() + '.graphql'}"
 
 type Query {
   # Get all ${pluralize(type.name)}.

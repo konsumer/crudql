@@ -1,0 +1,12 @@
+# import DateTime, Email from "scalars.graphql"
+
+type User {
+  id: ID!
+  email: Email!
+
+  # when was this created?
+  createdAt: DateTime!
+
+  # when was this last updated?
+  updatedAt: DateTime!
+}

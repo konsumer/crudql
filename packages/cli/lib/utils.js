@@ -9,8 +9,8 @@ const getType = async (file, model) => {
 
   if (!model || types.indexOf(model) === -1) {
     yargs.showHelp()
-    console.log('\n[model] can be one of these:')
-    console.log(types.join('\n'))
+    console.error('\n[model] can be one of these:')
+    console.error(types.join('\n'))
     process.exit(1)
   }
 

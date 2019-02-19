@@ -1,0 +1,27 @@
+# import User from "user.graphql"
+
+type Query {
+  # Get all Users.
+  listUsers(pageStart: Int = 0, pageSize: Int = 100): [User]!
+  
+  # Get a single User.
+  getUser(id: ID!): User!
+}  
+
+type Mutation {
+  # Update an existing User.
+  updateUser(UserUpdate): User!
+  
+  # Create a new User.
+  createUser(UserNew): User!
+}
+
+input UserUpdate {
+  id: ID!
+  email: Email
+}
+
+input UserNew {
+  email: Email!
+}
+

@@ -1,26 +1,8 @@
 # crudql example
 
-Let's say I have a model like this:
+Let's first imagine you have a model like [this](schema/thing.graphql).
 
-```graphql
-type Thing {
-  id: ID!
-  
-  # the title of this Thing
-  title: String!
-  
-  # extra info about this Thing
-  extraInfo: String
-
-  # when was this created?
-  createdAt: DateTime!
-
-  # when was this last updated?
-  updatedAt: DateTime!
-}
-```
-
-This is the full type definition, but `createdAt` and `updatedAt` are special, and will be set in the resolvers, on the server-side. `id: ID!` is required for models to reference each other.
+This is the full type definition, but `createdAt` and `updatedAt` are special, and will be set in the resolvers, on the server-side. `id: ID!` is required for models to reference each other. I import my `scalars`, so I can use them.
 
 
 #### boilerplate
@@ -32,198 +14,58 @@ Let's get our project all setup for ourselves:
 npm init -y
 
 # install some deps we will be using for the server
-npm i -S graphql-custom-types graphql-type-json @crudql/dynamo express apollo-server-express
+npm i -S graphql graphql-custom-types graphql-type-json express apollo-server-express require-glob @crudql/dynamo@latest
 
-# your typeDefs will go here
-mkdir schema
+# your typeDefs & resolvers will go here
+mkdir schema resolvers
 
-# your resolvers will go here
-mkdir resolvers
+# setup some demo-models
+git clone git@github.com:konsumer/crudql.git ~/Desktop/crudql
+cp ~/Desktop/crudql/example/schema/scalars.graphql ~/Desktop/crudql/example/schema/thing.graphql ~/Desktop/crudql/example/schema/user.graphql schema/
+cp ~/Desktop/crudql/example/resolvers/scalars.js resolvers/
+cp ~/Desktop/crudql/example/server.js ~/Desktop/crudql/example/setup.js .
+```
 
-# your basic scalar typeDefs
-echo <<< EOF
-scalar Json
-scalar DateTime
-scalar Email
-scalar URL
-EOF > schema/scalars.graphql
-
-# your basic scalar resolvers
-echo <<< EOF
-const JSONType = require('graphql-type-json')
-const {
-  GraphQLEmail,
-  GraphQLURL,
-  GraphQLDateTime
-} = require('graphql-custom-types')
-
-module.exports = {
-  Json: JSONType,
-  DateTime: GraphQLDateTime,
-  Email: GraphQLEmail,
-  URL: GraphQLURL
-}
-EOF > resolvers/scalars.js
-
-# define your first type
-echo <<< EOF
-# import DateTime from "scalars.graphql"
-
-type Thing {
-  id: ID!
-  
-  # the title of this Thing
-  title: String!
-  
-  # extra info about this Thing
-  extraInfo: String
-
-  # when was this created?
-  createdAt: DateTime!
-
-  # when was this last updated?
-  updatedAt: DateTime!
-}
-EOF > schema/thing.graphql
-
+Now you have this file-structure:
+```
+package.json
+server.js
+setup.js
+schema/
+  scalars.graphql
+  thing.graphql
+  user.graphql
+resolvers/
+  scalars.js
 ```
 
 #### making the CRUD
 
-So first, I want to generate some CRUD schema definition:
+So first, I want to generate some CRUD schema-definitions:
 
 ```bash
 crudql schema schema/thing.graphql Thing > schema/thing_crud.graphql
+crudql schema schema/user.graphql User > schema/user_crud.graphql
 ```
 
-Which will make a file that looks like this:
+This gives us a full CRUD API schema-definition!
 
-```graphql
-# import Thing from "thing.graphql"
-
-type Query {
-  # Get all Things.
-  listThings(pageStart: Int = 0, pageSize: Int = 100): [Thing]!
-
-  # Get a single Thing.
-  getThing(id: ID!): Thing!
-}
-
-type Mutation {
-  # Update an existing Thing.
-  updateThing(ThingUpdate): Thing!
-
-  # Create a new Thing.
-  createThing(ThingNew): Thing!
-}
-
-input ThingUpdate {
-  id: ID!
-  title: String
-  extraInfo: String
-}
-
-input ThingNew {
-  title: String!
-  extraInfo: String
-}
-```
-
-
-This gives us a full CRUD API. Next I want a DynamoDB resolver:
+Next I want some DynamoDB resolvers:
 
 ```bash
 crudql dynamo schema/thing.graphql Thing > resolvers/thing.js
+crudql dynamo schema/user.graphql User > resolvers/user.js
 ```
 
-Which will make a file that looks like this:
+This will resolve everything. You can use `@crudql/dynamo` functions in your own resolvers, if you want, too. They return Promises, so they should be pretty easy to use however you like.
 
-```js
-const { list, get, update, create, setup } = require('@crudql/dynamo')
+#### server & setup
 
-module.exports = {
-  Query: {
-    listThings: list,
-    getThing: get
-  },
-  Mutation: {
-    updateThing: update,
-    createThing: create
-  },
-  
-  _setup: setup({ name: 'Thing', indexes: ["id"] })
-}
-```
+Have a look at `server.js` and `setup.js`, and feel free to customize them however you like.
 
-This will resolve everything, and has an unexposed function `_setup` that will actually set the model & it's indexes up for you, on Dynamo. You can use `@crudql/dynamo` functions in your own resolvers, if you want, too:
+I made a [couple `run` scripts in `package.json`](./package.json) that you can have a look at:
 
-```js
-const { list, get, update, create, setup } = require('@crudql/dynamo')
+* `start` - `node server.js` - starts local graphql server on port 3000
+* `setup` - `node setup.js` - asks you some questions and sets up your tables in dynamo
 
-module.exports = {
-  Query: {
-    listThings: async (current, args, context, info) => {
-      const things = await list(current, args, context, info)
-      // do stuff to things
-      return things
-    },
-    getThing: get
-  },
-  Mutation: {
-    updateThing: update,
-    createThing: create
-  },
-  
-  _setup: setup({ name: 'Thing', indexes: ["id"] })
-}
-```
-
-#### creating the server
-
-Now that you have your CRUD all setup, you can make a server that looks like this in `index.js`:
-
-```js
-const { importSchema } = require('graphql-import')
-const express = require('express')
-const { ApolloServer } = require('apollo-server-express')
-
-const resolvers = require('./resolvers/thing')
-const typeDefs = importSchema('./schema/thing_crud.graphql')
-
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  playground: true
-})
-
-const app = express()
-server.applyMiddleware({ app })
-app.listen(3000)
-
-```
-
-#### setup
-
-Make yourself a lil setup tool in `setup.js`:
-
-```js
-const { _setup } = require('./resolvers/thing')
-
-_setup()
-```
-
-Run your setup tool to build your structure in dynamodb:
-
-```bash
-node setup.js
-```
-
-Run your server:
-
-```bash
-node index.js
-```
-
-Now, you can visit your server at [http://localhost:3000/graphql](http://localhost:3000/graphql).
-
-### TODO: explain lodash.merge and merge-graphql-schemas for stitching together multiple resolvers & typeDefs
+Run `node setup.js`, then `node server.js` and you can visit your server at [http://localhost:3000/graphql](http://localhost:3000/graphql).

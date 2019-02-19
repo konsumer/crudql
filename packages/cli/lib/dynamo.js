@@ -1,23 +1,26 @@
-const { pluralize, foreign_key } = require('inflection')
+const { pluralize } = require('inflection')
 
 const getIndexes = type => {
   const out = new Set(Object.values(type._fields).map(f => {
     const plainType = f.type.toString().replace('!', '').replace('[', '').replace(']', '')
-    if (plainType === 'ID' && f.name === 'id') {
-      return 'id'
+    if (plainType === 'ID') {
+      return f.name
     } else if (
       f.type.constructor.name === 'GraphQLObjectType' ||
       (f.type.constructor.name === 'GraphQLNonNull' && f.type.ofType.constructor.name === 'GraphQLObjectType') ||
       (f.type.constructor.name === 'GraphQLNonNull' && f.type.ofType.constructor.name === 'GraphQLList' && f.type.ofType.ofType.constructor.name === 'GraphQLObjectType')
     ) {
-      return `${f.name}_${foreign_key(plainType)}`
+      return `${f.name}.${plainType}`
     }
   }))
-  return JSON.stringify([...out].filter(f => f))
+  return [...out].filter(f => f)
 }
 
-module.exports = (type, file) => `
-const { list, get, update, create, setup } = require('@crudql/dynamo')
+const getLinked = type => {
+  return '// TODO: linked fields'
+}
+
+module.exports = (type, file) => `const { list, get, update, create } = require('@crudql/dynamo')
 
 module.exports = {
   Query: {
@@ -29,7 +32,11 @@ module.exports = {
     update${type.name}: update,
     create${type.name}: create
   },
-  
-  _setup: setup({ name: '${type.name}', indexes: ${getIndexes(type)} })
+
+  ${type.name}: {
+    ${getLinked(type)}
+  },
+
+  _info: ${JSON.stringify({ name: type.name, indexes: getIndexes(type) })}
 }
 `

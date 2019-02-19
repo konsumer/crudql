@@ -1,0 +1,34 @@
+{
+  "name": "@crudql/dynamo",
+  "version": "0.0.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "Simple way to build CRUD GraphQL APIs and frontends.",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.405.0",
+    "chalk": "^2.4.2",
+    "enquirer": "^2.3.0",
+    "inflection": "^1.12.0",
+    "json-colorizer": "^2.1.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/konsumer/crudql.git"
+  },
+  "keywords": [
+    "graphql",
+    "generate",
+    "dynamodb"
+  ],
+  "author": "David Konsumer <konsumer@jetboystudio.com> (http://konsumer.js.org)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/konsumer/crudql/issues"
+  },
+  "homepage": "https://github.com/konsumer/crudql#readme"
+}

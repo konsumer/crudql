@@ -1,0 +1,19 @@
+{
+  "name": "@crudql/example",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "start": "node server.js",
+    "setup": "node setup.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@crudql/dynamo": "latest",
+    "apollo-server-express": "^2.4.2",
+    "express": "^4.16.4",
+    "graphql": "^14.1.1",
+    "graphql-custom-types": "^1.5.0",
+    "graphql-type-json": "^0.2.1",
+    "require-glob": "^3.2.0"
+  }
+}
