@@ -31,6 +31,47 @@ const awsRegions = {
 
 const db = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' })
 
+const client = {
+  list: (TableName, pageKey, pageSize) => db.scan(pageKey && pageSize ? { TableName, Limit: pageSize, ExclusiveStartKey: { S: pageKey } } : { TableName }).promise().then(r => r.Items || []),
+
+  get: async (TableName, id) => {
+    const items = await db.query({
+      TableName,
+      ExpressionAttributeValues: { ':id': id },
+      KeyConditionExpression: 'id = :id'
+    }).promise().then(r => r.Items)
+    if (!items || !items[0]) {
+      throw new Error('Not found.')
+    }
+    return items[0]
+  },
+
+  update: (TableName, Item, info) => {
+    // TODO: use info to pull out linked records & update them
+    Item.updatedAt = (new Date()).toISOString()
+    return db.update({
+      TableName,
+      ReturnValues: 'ALL_NEW',
+      ...handleUpdates(Item),
+      Key: { id: Item.id }
+    }).promise().then(r => r.Attributes)
+  },
+
+  create: (TableName, Item, info) => {
+    Item.createdAt = (new Date()).toISOString()
+    Item.updatedAt = Item.createdAt
+    Item.id = shortid()
+    return db.put({
+      TableName,
+      Item
+    }).promise().then(r => Item)
+  },
+
+  remove: (TableName, id) => {
+    // not implemented
+  }
+}
+
 // generate query for updating record
 const handleUpdates = updates => {
   const expression = []
@@ -49,47 +90,30 @@ const handleUpdates = updates => {
 const list = (current, args, context, info) => {
   const TableName = process.env[`TABLE_${info.returnType.ofType.ofType.name.toUpperCase()}`]
   const { pageKey, pageSize } = args
-  const params = pageKey && pageSize ? { TableName, Limit: pageSize, ExclusiveStartKey: { S: pageKey } } : { TableName }
-  return db.scan(params).promise().then(r => r.Items || [])
+  return client.list(TableName, pageKey, pageSize)
 }
 
 // get a single record by ID
-const get = async (current, args, context, info) => {
+const get = (current, args, context, info) => {
   const TableName = process.env[`TABLE_${info.returnType.ofType.name.toUpperCase()}`]
-  const items = await db.query({
-    TableName,
-    ExpressionAttributeValues: { ':id': args.id },
-    KeyConditionExpression: 'id = :id'
-  }).promise().then(r => r.Items)
-  if (!items || !items[0]) {
-    throw new Error('Not found.')
-  }
-  return items[0]
+  return client.get(TableName, args.id)
 }
 
 // update a sinfgle record
 const update = (current, args, context, info) => {
   const TableName = process.env[`TABLE_${info.returnType.ofType.name.toUpperCase()}`]
-  const Item = args.input
-  Item.updatedAt = (new Date()).toISOString()
-  return db.update({
-    TableName,
-    ReturnValues: 'ALL_NEW',
-    ...handleUpdates(Item),
-    Key: { id: Item.id }
-  }).promise().then(r => r.Attributes)
+  return client.update(TableName, args.input, info)
 }
 
 // create a new record
 const create = (current, args, context, info) => {
   const TableName = process.env[`TABLE_${info.returnType.ofType.name.toUpperCase()}`]
-  const Item = args.input
-  Item.createdAt = (new Date()).toISOString()
-  Item.id = shortid()
-  return db.put({
-    TableName,
-    Item
-  }).promise().then(r => Item)
+  return client.create(TableName, args.input, info)
+}
+
+const remove = (current, args, context, info) => {
+  const TableName = process.env[`TABLE_${info.returnType.ofType.name.toUpperCase()}`]
+  return client.remove(TableName, args.id)
 }
 
 // initial dynamo settings
@@ -234,4 +258,4 @@ const finishSetup = async (env, awsParams = {}) => {
   }
 }
 
-module.exports = { list, get, update, create, setup, initialSetup, finishSetup }
+module.exports = { list, get, update, create, setup, initialSetup, finishSetup, client, remove }

@@ -67,6 +67,9 @@ type Mutation {
   
   # Create a new ${type.name}.
   create${type.name}(input: ${type.name}New!): ${type.name}!
+
+  # Delete a ${type.name}.
+  delete${type.name}(id: ID!): ${type.name}!
 }
 
 input ${type.name}Update {

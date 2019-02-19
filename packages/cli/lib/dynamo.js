@@ -20,7 +20,7 @@ const getLinked = type => {
   return '// TODO: linked fields'
 }
 
-module.exports = (type, file) => `const { list, get, update, create } = require('@crudql/dynamo')
+module.exports = (type, file) => `const { list, get, update, create, remove } = require('@crudql/dynamo')
 
 module.exports = {
   Query: {
@@ -30,7 +30,8 @@ module.exports = {
   
   Mutation: {
     update${type.name}: update,
-    create${type.name}: create
+    create${type.name}: create,
+    delete${type.name}: remove
   },
 
   ${type.name}: {
