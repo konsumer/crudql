@@ -1,4 +1,4 @@
-# import DateTime from "scalars.graphql"
+# import DateTime, Json, Email from "scalars.graphql"
 
 type Thing {
   id: ID!
@@ -7,7 +7,27 @@ type Thing {
   title: String!
   
   # extra info about this Thing
-  extraInfo: String
+  extraInfo: Json
+
+  # who uses this thing?
+  users: [User]!
+
+  # who owns this thing?
+  owner: User!
+
+  # does this thign control a user?
+  controls: User
+
+  # when was this created?
+  createdAt: DateTime!
+
+  # when was this last updated?
+  updatedAt: DateTime!
+}
+
+type User {
+  id: ID!
+  email: Email!
 
   # when was this created?
   createdAt: DateTime!

@@ -14,7 +14,7 @@ If you want to use it without installing, just replace all uses of `crudql` with
 
 ## usage
 
-It will do more later, but my immediate needs were that I wanted to generate a CRUD API, that runs on dynamo, from a model-definition in GrapQL.
+It will do more later, but my immediate needs were that I wanted to generate a CRUD API, that runs on an efficiently-keyed dynamo table, from a model-definition in GrapQL.
 
 You can get help with this:
 
@@ -230,7 +230,7 @@ module.exports = {
     createThing: create
   },
   
-  _setup: setup({ name: 'Things', indexes: [] })
+  _setup: setup({ name: 'Things', indexes: ["id"] })
 }
 ```
 
