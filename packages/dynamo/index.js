@@ -3,6 +3,7 @@ const { prompt } = require('enquirer')
 const { tableize } = require('inflection')
 const AWS = require('aws-sdk')
 const colorize = require('json-colorizer')
+const shortid = require('shortid').generate
 
 const awsRegions = {
   'us-east-1': 'US East (N. Virginia)',
@@ -28,24 +29,67 @@ const awsRegions = {
   'sa-east-1': 'South America (São Paulo)'
 }
 
+const db = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' })
+
+// generate query for updating record
+const handleUpdates = updates => {
+  const expression = []
+  const ExpressionAttributeValues = {}
+  Object.keys(updates).forEach(k => {
+    if (k === 'id' || !updates[k] || updates[k] === '') {
+      return
+    }
+    expression.push(`${k} = :${k}`)
+    ExpressionAttributeValues[`:${k}`] = updates[k]
+  })
+  return { UpdateExpression: `set ${expression.join(', ')}`, ExpressionAttributeValues }
+}
+
 // get all records
 const list = (current, args, context, info) => {
-
+  const TableName = process.env[`TABLE_${info.returnType.ofType.ofType.name.toUpperCase()}`]
+  const { pageKey, pageSize } = args
+  const params = pageKey && pageSize ? { TableName, Limit: pageSize, ExclusiveStartKey: { S: pageKey } } : { TableName }
+  return db.scan(params).promise().then(r => r.Items || [])
 }
 
 // get a single record by ID
-const get = (current, args, context, info) => {
-
+const get = async (current, args, context, info) => {
+  const TableName = process.env[`TABLE_${info.returnType.ofType.name.toUpperCase()}`]
+  const items = await db.query({
+    TableName,
+    ExpressionAttributeValues: { ':id': args.id },
+    KeyConditionExpression: 'id = :id'
+  }).promise().then(r => r.Items)
+  if (!items || !items[0]) {
+    throw new Error('Not found.')
+  }
+  return items[0]
 }
 
 // update a sinfgle record
 const update = (current, args, context, info) => {
-
+  const TableName = process.env[`TABLE_${info.returnType.ofType.name.toUpperCase()}`]
+  const Item = args.input
+  Item.updatedAt = (new Date()).toISOString()
+  return db.update({
+    TableName,
+    ReturnValues: 'ALL_NEW',
+    ...handleUpdates(Item),
+    Key: { id: Item.id }
+  }).promise().then(r => r.Attributes)
 }
 
 // create a new record
 const create = (current, args, context, info) => {
-
+  const TableName = process.env[`TABLE_${info.returnType.ofType.name.toUpperCase()}`]
+  const Item = args.input
+  Item.createdAt = (new Date()).toISOString()
+  Item.id = shortid()
+  return db.put({
+    TableName,
+    Item
+  }).promise().then(r => Item)
 }
 
 // initial dynamo settings
@@ -127,7 +171,6 @@ const finishSetup = async (env, awsParams = {}) => {
   const allParams = []
   await Promise.all(Object.keys(tables).map(async t => {
     const TableName = tables[t]
-    console.log(`Creating ${chalk.inverse(TableName)} on AWS.`)
     const params = {
       AttributeDefinitions: [],
       KeySchema: [],
@@ -176,13 +219,16 @@ const finishSetup = async (env, awsParams = {}) => {
     allParams.push(params)
   }))
   console.log(colorize(JSON.stringify(allParams, null, 2)))
-  const doIt = await prompt({
+  const { confirm } = await prompt({
     type: 'confirm',
     name: 'confirm',
     message: 'Ready to do it?'
   })
-  if (doIt.confirm) {
-    await Promise.all(allParams.map(params => ddb.createTable(params).promise()))
+  if (confirm) {
+    await Promise.all(allParams.map(params => {
+      console.log(`Creating ${chalk.inverse(params.TableName)} on AWS.`)
+      return ddb.createTable(params).promise()
+    }))
   } else {
     console.log('Cancelled.')
   }

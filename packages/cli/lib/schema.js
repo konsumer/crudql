@@ -55,7 +55,7 @@ module.exports = (type, file) => `# import ${type.name} from "${file ? basename(
 
 type Query {
   # Get all ${pluralize(type.name)}.
-  list${pluralize(type.name)}(pageStart: Int = 0, pageSize: Int = 100): [${type.name}]!
+  list${pluralize(type.name)}(pageKey: String, pageSize: Int = 100): [${type.name}]!
   
   # Get a single ${type.name}.
   get${type.name}(id: ID!): ${type.name}!
@@ -63,10 +63,10 @@ type Query {
 
 type Mutation {
   # Update an existing ${type.name}.
-  update${type.name}(${type.name}Update): ${type.name}!
+  update${type.name}(input: ${type.name}Update!): ${type.name}!
   
   # Create a new ${type.name}.
-  create${type.name}(${type.name}New): ${type.name}!
+  create${type.name}(input: ${type.name}New!): ${type.name}!
 }
 
 input ${type.name}Update {

@@ -2,7 +2,7 @@
 
 type Query {
   # Get all Things.
-  listThings(pageStart: Int = 0, pageSize: Int = 100): [Thing]!
+  listThings(pageKey: String, pageSize: Int = 100): [Thing]!
   
   # Get a single Thing.
   getThing(id: ID!): Thing!
@@ -10,10 +10,10 @@ type Query {
 
 type Mutation {
   # Update an existing Thing.
-  updateThing(ThingUpdate): Thing!
+  updateThing(input: ThingUpdate!): Thing!
   
   # Create a new Thing.
-  createThing(ThingNew): Thing!
+  createThing(input: ThingNew!): Thing!
 }
 
 input ThingUpdate {

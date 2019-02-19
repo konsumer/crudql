@@ -57,7 +57,7 @@ crudql dynamo schema/thing.graphql Thing > resolvers/thing.js
 crudql dynamo schema/user.graphql User > resolvers/user.js
 ```
 
-This will resolve everything. You can use `@crudql/dynamo` functions in your own resolvers, if you want, too. They return Promises, so they should be pretty easy to use however you like.
+This will resolve everything. You can use `@crudql/dynamo` functions in your own resolvers, if you want, too. They return Promises, so they should be pretty easy to repurpose, however you like.
 
 #### server & setup
 

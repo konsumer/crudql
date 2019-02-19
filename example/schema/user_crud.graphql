@@ -2,7 +2,7 @@
 
 type Query {
   # Get all Users.
-  listUsers(pageStart: Int = 0, pageSize: Int = 100): [User]!
+  listUsers(pageKey: String, pageSize: Int = 100): [User]!
   
   # Get a single User.
   getUser(id: ID!): User!
@@ -10,10 +10,10 @@ type Query {
 
 type Mutation {
   # Update an existing User.
-  updateUser(UserUpdate): User!
+  updateUser(input: UserUpdate!): User!
   
   # Create a new User.
-  createUser(UserNew): User!
+  createUser(input: UserNew!): User!
 }
 
 input UserUpdate {

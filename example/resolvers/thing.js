@@ -5,7 +5,7 @@ module.exports = {
     listThings: list,
     getThing: get
   },
-
+  
   Mutation: {
     updateThing: update,
     createThing: create
@@ -15,5 +15,6 @@ module.exports = {
     // TODO: linked fields
   },
 
-  _info: { 'name': 'Thing', 'indexes': ['id', 'users.User', 'owner.User', 'controls.User'] }
+  _info: {"name":"Thing","indexes":["id","users.User","owner.User","controls.User"]}
 }
+
