@@ -207,7 +207,7 @@ module.exports = {
     createThing: create
   },
   
-  _setup: setup({ name: 'Things', indexes: ["id"] })
+  _setup: setup({ name: 'Thing', indexes: ["id"] })
 }
 ```
 
