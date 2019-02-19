@@ -249,7 +249,6 @@ const typeDefs = importSchema('./schema/thing_crud.graphql')
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  introspection: true,
   playground: true
 })
 

@@ -1,5 +1,4 @@
-# see README, but this is a basic scalar I use to represent a timestamp
-scalar DateTime
+# import DateTime from "scalars.graphql"
 
 type Thing {
   id: ID!
