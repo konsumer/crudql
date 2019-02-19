@@ -14,6 +14,9 @@ type Mutation {
   
   # Create a new User.
   createUser(input: UserNew!): User!
+
+  # Delete a User.
+  deleteUser(id: ID!): User!
 }
 
 input UserUpdate {
@@ -24,4 +27,3 @@ input UserUpdate {
 input UserNew {
   email: Email!
 }
-
