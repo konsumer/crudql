@@ -30,6 +30,6 @@ module.exports = {
     create${type.name}: create
   },
   
-  _setup: setup({ name: '${pluralize(type.name)}', indexes: ${getIndexes(type)} })
+  _setup: setup({ name: '${type.name}', indexes: ${getIndexes(type)} })
 }
 `
