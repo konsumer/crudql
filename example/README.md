@@ -44,8 +44,8 @@ resolvers/
 So first, I want to generate some CRUD schema-definitions:
 
 ```bash
-crudql schema schema/thing.graphql Thing > schema/thing_crud.graphql
-crudql schema schema/user.graphql User > schema/user_crud.graphql
+crudql schema schema/thing.graphql Thing
+crudql schema schema/user.graphql User
 ```
 
 This gives us a full CRUD API schema-definition!
@@ -53,8 +53,8 @@ This gives us a full CRUD API schema-definition!
 Next I want some DynamoDB resolvers:
 
 ```bash
-crudql dynamo schema/thing.graphql Thing > resolvers/thing.js
-crudql dynamo schema/user.graphql User > resolvers/user.js
+crudql dynamo schema/thing.graphql Thing
+crudql dynamo schema/user.graphql User
 ```
 
 This will resolve everything. You can use `@crudql/dynamo` functions in your own resolvers, if you want, too. They return Promises, so they should be pretty easy to repurpose, however you like.
