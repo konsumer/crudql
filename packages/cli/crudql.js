@@ -18,13 +18,13 @@ const argv = yargs
   .command('schema <file> <model>', 'Generate GraphQL schema for basic CRUD', yargs => {
     yargs.option('output', {
       alias: 'o',
-      describe: 'The directory where this gets outputted',
-      default: 'schema'
+      describe: 'The directory where this gets outputted, relative to the file',
+      default: '../schema'
     })
   }, async argv => {
     const { model, file, output } = argv
     const type = await getType(file, model)
-    const filename = path.join(output, model.toLowerCase() + '_crud.graphql')
+    const filename = path.join(path.resolve(path.dirname(file), output), model.toLowerCase() + '_crud.graphql')
     await writeFile(filename, schemaCommand(type, file))
     console.log(`Wrote file: ${filename}`)
   })
@@ -32,13 +32,13 @@ const argv = yargs
   .command('dynamo <file> <model>', 'Generate DynamoDB resolvers for basic CRUD schema', yargs => {
     yargs.option('output', {
       alias: 'o',
-      describe: 'The directory where this gets outputted',
-      default: 'resolvers'
+      describe: 'The directory where this gets outputted, relative to the file',
+      default: '../resolvers'
     })
   }, async argv => {
     const { model, file, output } = argv
     const type = await getType(file, model)
-    const filename = path.join(output, model.toLowerCase() + '_crud.js')
+    const filename = path.join(path.resolve(path.dirname(file), output), model.toLowerCase() + '_crud.js')
     await writeFile(filename, dynamoCommand(type, file))
     console.log(`Wrote file: ${filename}`)
   })
@@ -46,8 +46,8 @@ const argv = yargs
   .command('reactstrap <file> <model>', 'Generate components in reactstrap for CRUD', yargs => {
     yargs.option('output', {
       alias: 'o',
-      describe: 'The directory where this gets outputted',
-      default: 'components'
+      describe: 'The directory where this gets outputted, relative to the file',
+      default: '../components'
     })
   }, async argv => {
     const { model, file, output } = argv

@@ -1,4 +1,4 @@
-# import DateTime, Json, from "scalars.graphql"
+# import * from "scalars.graphql"
 # import User from "user.graphql"
 
 type Thing {
