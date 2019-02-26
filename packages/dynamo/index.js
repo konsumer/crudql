@@ -206,8 +206,9 @@ const setup = async (schemaFiles, models, awsParams = {}) => {
     allParams.push(params)
   })
 
-  console.log('Make sure to set these in your environment:')
+  console.log('\nMake sure to set these in your environment:\n')
   Object.keys(env).forEach(e => console.log(`${e}=${JSON.stringify(env[e])}`))
+  console.log('')
 
   console.log(`Here is what I will send to ${yellow('AWS')}!`)
   console.log(JSON.stringify(allParams, null, 2))
