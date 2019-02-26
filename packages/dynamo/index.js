@@ -197,7 +197,9 @@ const setup = async (schemaFiles, models, awsParams = {}) => {
       },
       ...awsParams
     }
-    // TODO: make indexes here?
+    params.AttributeDefinitions.push({ AttributeName: 'id', AttributeType: 'S' })
+    params.KeySchema.push({ AttributeName: 'id', KeyType: 'HASH' })
+    // TODO: make GSI here?
     if (params.KeySchema.length === 0) { delete params.KeySchema }
     if (params.GlobalSecondaryIndexes.length === 0) { delete params.GlobalSecondaryIndexes }
     if (params.AttributeDefinitions.length === 0) { delete params.AttributeDefinitions }
