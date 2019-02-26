@@ -12,6 +12,8 @@ npm i -g @crudql/cli
 
 If you want to use it without installing, just replace all uses of `crudql` with `npx  @crudql/cli`, in instructions below.
 
+It generates readable code, so you can modify it's output to do whatever you like.
+
 ## usage
 
 Check out [example](example) for a complete example, including the process I went through to make it.

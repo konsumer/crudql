@@ -50,9 +50,10 @@ const argv = yargs
       default: '../components'
     })
   }, async argv => {
-    const { model, file, output } = argv
+    const { model, file } = argv
     const type = await getType(file, model)
     // code goes here
+    console.log(type)
   })
 
   .command('show <file> <model>', 'Just shows the model', yargs => {}, async argv => {
@@ -60,5 +61,4 @@ const argv = yargs
     const type = await getType(file, model)
     console.dir(type)
   })
-
   .argv

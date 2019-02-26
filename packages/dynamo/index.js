@@ -1,9 +1,10 @@
-const chalk = require('chalk')
+const { bold, yellow, inverse } = require('chalk')
 const { prompt } = require('enquirer')
-const { tableize } = require('inflection')
 const AWS = require('aws-sdk')
-const colorize = require('json-colorizer')
 const shortid = require('shortid').generate
+const { importSchema } = require('graphql-import')
+const { buildSchema } = require('graphql')
+const { tableize } = require('inflection')
 
 const awsRegions = {
   'us-east-1': 'US East (N. Virginia)',
@@ -116,9 +117,28 @@ const remove = (current, args, context, info) => {
   return client.remove(TableName, args.id)
 }
 
-// initial dynamo settings
-const initialSetup = async () => {
-  console.log(chalk.bold('Database Setup\n'))
+const schemaToTypes = schema => Object.keys(schema._typeMap).filter(k => k[0] !== '_' && schema._typeMap[k].astNode && schema._typeMap[k].astNode.kind === 'ObjectTypeDefinition')
+
+// ask some questions & setup the database
+const setup = async (schemaFiles, models, awsParams = {}) => {
+  console.log(bold('Database Setup\n'))
+  const schemas = schemaFiles.map(file => buildSchema(importSchema(file)))
+  const types = [].concat.apply([], schemas.map(s => schemaToTypes(s))).filter((v, i, a) => a.indexOf(v) === i && v !== 'Query' && v !== 'Mutation')
+  if (!models) {
+    const answer = await prompt({
+      type: 'multiselect',
+      choices: types,
+      message: 'Which models woould you like to add to Dynamo?',
+      name: 'models'
+    })
+    models = answer.models
+  }
+
+  if (!models.length) {
+    console.log('Nothing to do.')
+    process.exit()
+  }
+
   const questions = [
     {
       type: 'select',
@@ -130,13 +150,13 @@ const initialSetup = async () => {
     {
       type: 'input',
       name: 'AWS_ACCESS_KEY_ID',
-      message: `${chalk.yellow('AWS_ACCESS_KEY_ID')}?`,
+      message: `${yellow('AWS_ACCESS_KEY_ID')}?`,
       default: process.env.AWS_ACCESS_KEY_ID
     },
     {
       type: 'password',
       name: 'AWS_SECRET_ACCESS_KEY',
-      message: `${chalk.yellow('AWS_SECRET_ACCESS_KEY')}?`,
+      message: `${yellow('AWS_SECRET_ACCESS_KEY')}?`,
       default: process.env.AWS_SECRET_ACCESS_KEY
     },
     {
@@ -149,52 +169,20 @@ const initialSetup = async () => {
   const response = await prompt(questions)
   const AWS_REGION = Object.keys(awsRegions)[Object.values(awsRegions).indexOf(response.AWS_REGION)]
   const { AWS_SECRET_ACCESS_KEY, AWS_ACCESS_KEY_ID, TABLE_PREFIX } = response
-  return { AWS_SECRET_ACCESS_KEY, AWS_ACCESS_KEY_ID, AWS_REGION, TABLE_PREFIX }
-}
-
-// setup a dynamodb table
-const setup = async (tableInfo, initialConfig, totalConfig, last) => {
-  console.log('\n' + chalk.bold(tableInfo.name) + '\n')
-  const questions = [
-    {
+  const tableQuestions = models.map(model => {
+    return {
       type: 'input',
-      name: 'table',
-      message: 'What is the name of the table?',
-      default: initialConfig.TABLE_PREFIX + tableize(tableInfo.name)
+      name: model,
+      message: `What is the name of the ${inverse(model)} table?`,
+      default: TABLE_PREFIX + tableize(model)
     }
-  ]
-  const response = await prompt(questions)
-  const env = { ...initialConfig, ...totalConfig }
-  env[`TABLE_${tableInfo.name.toUpperCase()}`] = `${response.table}`
-  env.keys[ tableInfo.name ] = tableInfo.indexes
-  return env
-}
+  })
+  const tables = await prompt(tableQuestions)
 
-// do actual config
-const finishSetup = async (env, awsParams = {}) => {
-  delete env.TABLE_PREFIX
-  console.log('\nMake sure you have these set in your environment:\n')
-  Object.keys(env).forEach(k => {
-    if (k === 'keys') {
-      return
-    }
-    if (k === 'AWS_SECRET_ACCESS_KEY') {
-      console.log(`${chalk.green('AWS_SECRET_ACCESS_KEY')}="${chalk.yellow(env.AWS_SECRET_ACCESS_KEY.replace(/./g, '*'))}"`)
-    } else {
-      console.log(`${chalk.green(k)}=${chalk.yellow(JSON.stringify(env[k]))}`)
-    }
-  })
-  console.log('')
-  const { AWS_SECRET_ACCESS_KEY, AWS_ACCESS_KEY_ID, AWS_REGION, keys, ...tables } = env
-  AWS.config.update({
-    region: AWS_REGION,
-    accessKeyId: AWS_ACCESS_KEY_ID,
-    secretAccessKey: AWS_SECRET_ACCESS_KEY
-  })
-  const ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' })
+  const env = { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: '***********', AWS_REGION }
   const allParams = []
-  await Promise.all(Object.keys(tables).map(async t => {
-    const TableName = tables[t]
+  Object.keys(tables).forEach(t => {
+    env[`TABLE_${t.toUpperCase()}`] = tables[t]
     const params = {
       AttributeDefinitions: [],
       KeySchema: [],
@@ -203,54 +191,38 @@ const finishSetup = async (env, awsParams = {}) => {
         ReadCapacityUnits: 1,
         WriteCapacityUnits: 1
       },
-      TableName,
+      TableName: tables[t],
       StreamSpecification: {
         StreamEnabled: false
       },
       ...awsParams
     }
-    const i = Object.keys(env.keys).find(k => t === `TABLE_${k.toUpperCase()}`)
-    if (i) {
-      const currentKeys = env.keys[i]
-      if (currentKeys.find(k => k === 'id')) {
-        params.AttributeDefinitions.push({ AttributeName: 'id', AttributeType: 'S' })
-        params.KeySchema.push({ AttributeName: 'id', KeyType: 'HASH' })
-        currentKeys.forEach(k => {
-          if (k !== 'id') {
-            const AttributeName = k.split('.')[0]
-            params.AttributeDefinitions.push({ AttributeName, AttributeType: 'S' })
-            params.GlobalSecondaryIndexes.push({
-              IndexName: tableize(k).replace(/\./g, ''),
-              KeySchema: [{
-                AttributeName,
-                KeyType: 'HASH'
-              }],
-              Projection: {
-                'ProjectionType': 'ALL'
-              },
-              ProvisionedThroughput: {
-                ReadCapacityUnits: 1,
-                WriteCapacityUnits: 1
-              }
-            })
-          }
-        })
-      }
-    }
+    // TODO: make indexes here?
     if (params.KeySchema.length === 0) { delete params.KeySchema }
     if (params.GlobalSecondaryIndexes.length === 0) { delete params.GlobalSecondaryIndexes }
     if (params.AttributeDefinitions.length === 0) { delete params.AttributeDefinitions }
     allParams.push(params)
-  }))
-  console.log(colorize(JSON.stringify(allParams, null, 2)))
+  })
+
+  console.log('Make sure to set these in your environment:')
+  Object.keys(env).forEach(e => console.log(`${e}=${JSON.stringify(env[e])}`))
+
+  console.log(`Here is what I will send to ${yellow('AWS')}!`)
+  console.log(JSON.stringify(allParams, null, 2))
   const { confirm } = await prompt({
     type: 'confirm',
     name: 'confirm',
     message: 'Ready to do it?'
   })
   if (confirm) {
+    AWS.config.update({
+      region: AWS_REGION,
+      accessKeyId: AWS_ACCESS_KEY_ID,
+      secretAccessKey: AWS_SECRET_ACCESS_KEY
+    })
+    const ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' })
     await Promise.all(allParams.map(params => {
-      console.log(`Creating ${chalk.inverse(params.TableName)} on AWS.`)
+      console.log(`Creating ${inverse(params.TableName)} on AWS.`)
       return ddb.createTable(params).promise()
     }))
   } else {
@@ -258,4 +230,4 @@ const finishSetup = async (env, awsParams = {}) => {
   }
 }
 
-module.exports = { list, get, update, create, setup, initialSetup, finishSetup, client, remove }
+module.exports = { list, get, update, create, client, remove, setup }
