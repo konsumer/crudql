@@ -112,14 +112,20 @@ const create = (current, args, context, info) => {
   return client.create(TableName, args.input, info)
 }
 
+// delete a record
 const remove = (current, args, context, info) => {
   const TableName = process.env[`TABLE_${info.returnType.ofType.name.toUpperCase()}`]
   return client.remove(TableName, args.id)
 }
 
+// lookup a referenced field
+const reference = (field) => (current, args, context, info) => {
+  console.log('REFERENCE', { field, info, current })
+}
+
 const schemaToTypes = schema => Object.keys(schema._typeMap).filter(k => k[0] !== '_' && schema._typeMap[k].astNode && schema._typeMap[k].astNode.kind === 'ObjectTypeDefinition')
 
-// ask some questions & setup the database
+// ask some questions & setup the database tables
 const setup = async (schemaFiles, models, awsParams = {}) => {
   console.log(bold('Database Setup\n'))
   const schemas = schemaFiles.map(file => buildSchema(importSchema(file)))
@@ -199,7 +205,7 @@ const setup = async (schemaFiles, models, awsParams = {}) => {
     }
     params.AttributeDefinitions.push({ AttributeName: 'id', AttributeType: 'S' })
     params.KeySchema.push({ AttributeName: 'id', KeyType: 'HASH' })
-    // TODO: make GSI here?
+    // TODO: make GSIs here?
     if (params.KeySchema.length === 0) { delete params.KeySchema }
     if (params.GlobalSecondaryIndexes.length === 0) { delete params.GlobalSecondaryIndexes }
     if (params.AttributeDefinitions.length === 0) { delete params.AttributeDefinitions }
@@ -233,4 +239,4 @@ const setup = async (schemaFiles, models, awsParams = {}) => {
   }
 }
 
-module.exports = { list, get, update, create, client, remove, setup }
+module.exports = { list, get, update, create, client, remove, setup, reference }

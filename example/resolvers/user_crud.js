@@ -5,14 +5,9 @@ module.exports = {
     listUsers: list,
     getUser: get
   },
-  
   Mutation: {
     updateUser: update,
     createUser: create,
     deleteUser: remove
-  },
-
-  User: {
-    // TODO: linked fields
   }
 }
