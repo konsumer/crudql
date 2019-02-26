@@ -32,6 +32,7 @@ const awsRegions = {
 
 const db = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' })
 
+// TODO: Use a DataLoader?
 const client = {
   list: (TableName, pageKey, pageSize) => db.scan(pageKey && pageSize ? { TableName, Limit: pageSize, ExclusiveStartKey: { S: pageKey } } : { TableName }).promise().then(r => r.Items || []),
 
@@ -48,7 +49,6 @@ const client = {
   },
 
   update: (TableName, Item, info) => {
-    // TODO: use info to pull out linked records & update them
     Item.updatedAt = (new Date()).toISOString()
     return db.update({
       TableName,
@@ -68,8 +68,12 @@ const client = {
     }).promise().then(r => Item)
   },
 
-  remove: (TableName, id) => {
-    // not implemented
+  remove: async (TableName, id) => {
+    const Item = await client.get(TableName, id)
+    return db.delete({
+      TableName,
+      Key: { id }
+    }).promise().then(r => Item)
   }
 }
 
@@ -119,8 +123,18 @@ const remove = (current, args, context, info) => {
 }
 
 // lookup a referenced field
-const reference = (field) => (current, args, context, info) => {
-  console.log('REFERENCE', { field, info, current })
+const reference = (current, args, context, info) => {
+  const { fieldName, returnType } = info
+  const value = current[fieldName]
+  let type = returnType
+  if (type.ofType) {
+    type = type.ofType
+  }
+  if (type.ofType) {
+    type = type.ofType
+  }
+  const TableName = process.env[`TABLE_${type.toString().toUpperCase()}`]
+  return returnType.toString().indexOf('[') === 0 ? Promise.all(value.map(i => client.get(TableName, i))) : client.get(TableName, value)
 }
 
 const schemaToTypes = schema => Object.keys(schema._typeMap).filter(k => k[0] !== '_' && schema._typeMap[k].astNode && schema._typeMap[k].astNode.kind === 'ObjectTypeDefinition')

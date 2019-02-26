@@ -10,7 +10,7 @@ const getLinked = type => {
       (t.ofType && t.ofType.constructor.name === 'GraphQLObjectType') ||
       (t.ofType && t.ofType.ofType && t.ofType.ofType.constructor.name === 'GraphQLObjectType')
     ) {
-      out.push(`${name}: reference('${name}')`)
+      out.push(`${name}: reference`)
     }
   })
 

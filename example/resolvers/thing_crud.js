@@ -11,8 +11,8 @@ module.exports = {
     deleteThing: remove
   },
   Thing: {
-    users: reference('users'),
-    owner: reference('owner'),
-    controls: reference('controls')
+    users: reference,
+    owner: reference,
+    controls: reference
   }
 }
