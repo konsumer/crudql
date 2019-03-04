@@ -1,0 +1,42 @@
+import React from 'react'
+import gql from 'graphql-tag'
+import { Query } from 'react-apollo'
+
+const List{{Model}} = ggl`
+  List{{Model}}{
+    list{{plural Model}} {
+      {{listFields fields 3}}
+    }
+  }
+`
+
+export const List = ({}) => (
+  <Query query={List{{Model}}}>
+    {({ data, loading }) => (
+      {!loading && (
+        <table>
+          <thead>
+            <tr>
+              {{#each fields}}
+                <th>{{name}}</th>
+              {{/each}}
+            </tr>
+          </thead>
+          <tbody>
+            {data.list{{plural Model}}.map(d => (
+              <tr>
+                {{#each fields}}
+                  <td>{d.{{name}}}</td>
+                {{/each}}
+                <td>
+                  <ButtonDelete onClick={verifyDelete(d.id)}/>
+                  <ButtonEdit onClick={handleEdit(d.id)}/>
+                </td>
+              </tr>
+            )) }
+          </tbody>
+        </table>
+      )}
+    )}
+  </Query>
+)
