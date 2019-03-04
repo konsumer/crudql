@@ -16,7 +16,7 @@ It generates readable code, so you can modify it's output to do whatever you lik
 
 ## usage
 
-Check out [example](example) for a complete example, including the process I went through to make it.
+Check out [example](example) for a complete example, including the [process](example/PROCESS.md) I went through to make it.
 
 
 It will do more later, but my immediate needs were that I wanted to generate a CRUD API, that runs on an efficiently-keyed dynamo table, from a model-definition in GrapQL.

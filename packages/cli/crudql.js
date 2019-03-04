@@ -10,6 +10,7 @@ const writeFile = promisify(fs.writeFile)
 const { getType } = require('./lib/utils')
 const schemaCommand = require('./lib/schema')
 const dynamoCommand = require('./lib/dynamo')
+const reactstrapCommand = require('./lib/reactstrap')
 
 const argv = yargs
   .usage('Usage: $0 <command> [options]')
@@ -50,10 +51,11 @@ const argv = yargs
       default: '../components'
     })
   }, async argv => {
-    const { model, file } = argv
+    const { model, file, output } = argv
     const type = await getType(file, model)
-    // code goes here
-    console.log(type)
+    const filename = path.join(path.resolve(path.dirname(file), output), 'CRUD_' + model.toLowerCase() + '.js')
+    await writeFile(filename, reactstrapCommand(type, file))
+    console.log(`Wrote file: ${filename}`)
   })
 
   .command('show <file> <model>', 'Just shows the model', yargs => {}, async argv => {

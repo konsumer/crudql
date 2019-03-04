@@ -1,0 +1,32 @@
+{
+  "name": "@crudql/reactstrap",
+  "version": "0.0.4",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "Simple way to build CRUD GraphQL APIs and frontends.",
+  "main": "index.js",
+  "dependencies": {
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/konsumer/crudql.git"
+  },
+  "keywords": [
+    "graphql",
+    "generate",
+    "dynamodb",
+    "react",
+    "reactstrap",
+    "bootstrap"
+  ],
+  "author": "David Konsumer <konsumer@jetboystudio.com> (http://konsumer.js.org)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/konsumer/crudql/issues"
+  },
+  "homepage": "https://github.com/konsumer/crudql#readme"
+}
