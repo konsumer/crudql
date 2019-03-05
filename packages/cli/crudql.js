@@ -13,7 +13,6 @@ const schemaCommand = require('./lib/schema')
 const dynamoCommand = require('./lib/dynamo')
 const reactstrapCommand = require('./lib/reactstrap')
 
-
 // Get a specific type definition from a GrapQL file
 const getType = async (file, model) => {
   const schema = buildSchema(importSchema(file))
@@ -29,7 +28,7 @@ const getType = async (file, model) => {
   return schema._typeMap[model]
 }
 
-const argv = yargs
+module.exports = yargs
   .usage('Usage: $0 <command> [options]')
   .demandCommand(1)
 
@@ -65,7 +64,7 @@ const argv = yargs
     yargs.option('output', {
       alias: 'o',
       describe: 'The filename to output, relative to the model-file',
-      default: '../components/CRUD_{NAME}.js'
+      default: '../components/Crud{NAME}.js'
     })
   }, async argv => {
     const { model, file, output } = argv
@@ -80,4 +79,5 @@ const argv = yargs
     const type = await getType(file, model)
     console.dir(type)
   })
+
   .argv

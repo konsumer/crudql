@@ -1,42 +1,115 @@
 import React from 'react'
 import gql from 'graphql-tag'
-import { Query } from 'react-apollo'
+import { Query, Mutation } from 'react-apollo'
+import { ButtonModal } from '@crudql/reactstrap'
 
-const List{{Model}} = ggl`
-  List{{Model}}{
-    list{{plural Model}} {
-      {{listFields fields 3}}
+const queryGet{{plural name}} = gql`
+  Get{{name}}($id: ID!){
+    get{{name}}(id: $id) {
+      {{listFields astNode.fields 3}}
     }
   }
 `
 
-export const List = ({}) => (
-  <Query query={List{{Model}}}>
-    {({ data, loading }) => (
-      {!loading && (
-        <table>
-          <thead>
-            <tr>
-              {{#each fields}}
-                <th>{{name}}</th>
-              {{/each}}
-            </tr>
-          </thead>
-          <tbody>
-            {data.list{{plural Model}}.map(d => (
-              <tr>
-                {{#each fields}}
-                  <td>{d.{{name}}}</td>
-                {{/each}}
-                <td>
-                  <ButtonDelete onClick={verifyDelete(d.id)}/>
-                  <ButtonEdit onClick={handleEdit(d.id)}/>
-                </td>
-              </tr>
-            )) }
-          </tbody>
-        </table>
+const queryList{{plural name}} = gql`
+  List{{plural name}}{
+    list{{plural name}} {
+      {{listFields astNode.fields 3}}
+    }
+  }
+`
+
+const mutationDelete{{name}} = gql`
+  mutation Delete{{name}}($id: ID!){
+    delete{{name}}(id: $id){
+      id
+    }
+  }
+`
+
+const mutationUpdate{{name}} = gql`
+  mutation Update{{name}}($input: {{name}}Update){
+    update{{name}}(input: $input){
+      id
+    }
+  }
+`
+
+const mutationCreate{{name}} = gql`
+  mutation Create{{name}}($input: {{name}}New){
+    create{{name}}(input: $input){
+      id
+    }
+  }
+`
+
+export const Form{{name}} = ({ item }) => {
+  // TODO: form goes here
+  return null
+}
+
+export const ButtonNew = ({ item }) => {
+  return (
+    <Mutation mutation={mutationCreate{{~name~}}}>
+      {({ mutate }) => (
+        <ButtonModal className='bmd-btn-fab' color='success' title='Create {{name}}' content={<Form{{name}} />} onComplete={() => mutate({ variables: { input: item } })}>
+          <i className='material-icons'>add</i>
+        </ButtonModal>
       )}
+    </Mutation>
+  )
+}
+
+export const ButtonEdit = ({ item }) => {
+  return (
+    <Mutation mutation={mutationUpdate{{~name~}}}>
+      {({ mutate }) => (
+        <ButtonModal color='primary' title='Edit {{name}}' content={<Form{{name}} item={item} />} onComplete={() => mutate({ variables: { input: item } })}>
+          <i className='material-icons'>edit</i>
+        </ButtonModal>
+      )}
+    </Mutation>
+  )
+}
+
+export const ButtonDelete = ({ item }) => {
+  return (
+    <Mutation mutation={mutationDelete{{~name~}}}>
+      {({ mutate }) => (
+        <ButtonModal color='danger' title='Delete {{name}}' content='Are you sure you want to delete this {{name}}?' onComplete={() => mutate({ variables: { id: item.id } })}>
+          <i className='material-icons'>delete</i>
+        </ButtonModal>
+      )}
+    </Mutation>
+  )
+}
+
+export const List{{plural name}} = () => (
+  <Query query={queryList{{~plural name~}}}>
+    {({ data, loading }) => !loading && (
+      <table>
+        <thead>
+          <tr>
+            {{#each astNode.fields}}
+            <th>{{name.value}}</th>
+            {{/each}}
+            <th />
+          </tr>
+        </thead>
+        <tbody>
+          {data.list{{plural name}}.map(d => (
+            <tr>
+              {{#each astNode.fields}}
+              <td>{d.{{~name.value~}}}</td>
+              {{/each}}
+              <td>
+                <ButtonDelete item={d} />
+                <ButtonEdit item={d} />
+              </td>
+            </tr>
+          )) }
+        </tbody>
+      </table>
     )}
   </Query>
 )
