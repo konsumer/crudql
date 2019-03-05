@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 import { Query, Mutation } from 'react-apollo'
 import { ButtonModal } from '@crudql/reactstrap'
 
-const queryGet{{plural name}} = gql`
+export const queryGet{{plural name}} = gql`
   Get{{name}}($id: ID!){
     get{{name}}(id: $id) {
       {{listFields astNode.fields 3}}
@@ -11,7 +11,7 @@ const queryGet{{plural name}} = gql`
   }
 `
 
-const queryList{{plural name}} = gql`
+export const queryList{{plural name}} = gql`
   List{{plural name}}{
     list{{plural name}} {
       {{listFields astNode.fields 3}}
@@ -19,7 +19,7 @@ const queryList{{plural name}} = gql`
   }
 `
 
-const mutationDelete{{name}} = gql`
+export const mutationDelete{{name}} = gql`
   mutation Delete{{name}}($id: ID!){
     delete{{name}}(id: $id){
       id
@@ -27,7 +27,7 @@ const mutationDelete{{name}} = gql`
   }
 `
 
-const mutationUpdate{{name}} = gql`
+export const mutationUpdate{{name}} = gql`
   mutation Update{{name}}($input: {{name}}Update){
     update{{name}}(input: $input){
       id
@@ -35,7 +35,7 @@ const mutationUpdate{{name}} = gql`
   }
 `
 
-const mutationCreate{{name}} = gql`
+export const mutationCreate{{name}} = gql`
   mutation Create{{name}}($input: {{name}}New){
     create{{name}}(input: $input){
       id
@@ -43,7 +43,7 @@ const mutationCreate{{name}} = gql`
   }
 `
 
-export const Form{{name}} = ({ item }) => {
+export export const Form{{name}} = ({ item }) => {
   // TODO: form goes here
   return null
 }
