@@ -1,14 +1,19 @@
 {
   "name": "@crudql/reactstrap",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "publishConfig": {
     "access": "public"
   },
   "description": "Simple way to build CRUD GraphQL APIs and frontends.",
-  "main": "index.js",
-  "dependencies": {},
+  "main": "build/index.js",
+  "dependencies": {
+    "prop-types": "^15.7.2",
+    "react": "^16.8.4",
+    "reactstrap": "^7.1.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "babel --presets react index.js -d build/",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -27,5 +32,9 @@
   "bugs": {
     "url": "https://github.com/konsumer/crudql/issues"
   },
-  "homepage": "https://github.com/konsumer/crudql#readme"
+  "homepage": "https://github.com/konsumer/crudql#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react": "^6.24.1"
+  }
 }
