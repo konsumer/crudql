@@ -10,7 +10,9 @@ export const queryGetThing = gql`
       id,
       title,
       extraInfo,
-      users,
+      users {
+        id
+      },
       owner,
       controls,
       createdAt,
@@ -25,7 +27,6 @@ export const queryListThings = gql`
       id,
       title,
       extraInfo,
-      users,
       owner,
       controls,
       createdAt,
@@ -81,7 +82,7 @@ export const ButtonEditThing = ({ item, ...props }) => {
   return (
     <Mutation mutation={mutationUpdateThing}>
       {({ mutate }) => (
-        <ButtonModal 
+        <ButtonModal
           title='Edit Thing'
           content={<FormThing item={item} />}
           onComplete={() => mutate({ variables: { input: item } })}

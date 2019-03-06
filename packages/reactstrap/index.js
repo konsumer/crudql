@@ -81,10 +81,10 @@ class ButtonModal extends Component {
 
 ButtonModal.propTypes = {
   children: PropTypes.node.isRequired,
-  onComplete: PropTypes.function,
+  onComplete: PropTypes.func,
   title: PropTypes.string,
   content: PropTypes.node.isRequired,
-  showCancel: PropTypes.boolean
+  showCancel: PropTypes.bool
 }
 
 ButtonModal.defaultProps = {
