@@ -1,0 +1,18 @@
+const { {{~join imports ', '~}} } = require('@crudql/dynamo')
+
+module.exports = {
+  Query: {
+    list{{plural name}}: list,
+    get{{name}}: get
+  },
+  Mutation: {
+    update{{name}}: update,
+    create{{name}}: create,
+    delete{{name}}: remove
+  }{{#if linked.length}},
+  {{name}}: {
+    {{join linked ',
+    '}}
+  }
+  {{/if}}
+}

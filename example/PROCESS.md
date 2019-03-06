@@ -72,7 +72,7 @@ crudql reactstrap schema/thing.graphql Thing
 crudql reactstrap schema/user.graphql User
 ```
 
-This will create `components/CRUD_Thing.js` and `components/CRUD_User.js`, which are used by `pages/*.js` to create your CRUD frontend.
+This will create `components/CrudThing.js` and `components/CrudUser.js`. They export a few components, that you can use individually, or as a whole. I have an example of using the new-buttons and lists in `pages/index.js`. You can also modify the output and tune it to work better with your frontend, however you like. They are setup to use modals in the listview, but you could use them in routes or whatever, if your app is structured that way.
 
 
 #### server & setup

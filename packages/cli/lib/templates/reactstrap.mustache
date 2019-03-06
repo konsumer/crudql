@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 import { Query, Mutation } from 'react-apollo'
 import { ButtonModal } from '@crudql/reactstrap'
 
-export const queryGet{{plural name}} = gql`
+export const queryGet{{name}} = gql`
   Get{{name}}($id: ID!){
     get{{name}}(id: $id) {
       {{listFields astNode.fields 3}}
@@ -43,42 +43,50 @@ export const mutationCreate{{name}} = gql`
   }
 `
 
-export export const Form{{name}} = ({ item }) => {
+export const Form{{name}} = ({ item }) => {
   // TODO: form goes here
   return null
 }
 
-export const ButtonNew = ({ item }) => {
+export const ButtonNew{{name}} = ({ item, ...props }) => {
   return (
     <Mutation mutation={mutationCreate{{~name~}}}>
       {({ mutate }) => (
-        <ButtonModal className='bmd-btn-fab' color='success' title='Create {{name}}' content={<Form{{name}} />} onComplete={() => mutate({ variables: { input: item } })}>
-          <i className='material-icons'>add</i>
-        </ButtonModal>
+        <ButtonModal
+          title='Create {{name}}'
+          content={<Form{{name}} />} onComplete={() => mutate({ variables: { input: item } })}
+          {...props}
+        />
       )}
     </Mutation>
   )
 }
 
-export const ButtonEdit = ({ item }) => {
+export const ButtonEdit{{name}} = ({ item, ...props }) => {
   return (
     <Mutation mutation={mutationUpdate{{~name~}}}>
       {({ mutate }) => (
-        <ButtonModal color='primary' title='Edit {{name}}' content={<Form{{name}} item={item} />} onComplete={() => mutate({ variables: { input: item } })}>
-          <i className='material-icons'>edit</i>
-        </ButtonModal>
+        <ButtonModal 
+          title='Edit {{name}}'
+          content={<Form{{name}} item={item} />}
+          onComplete={() => mutate({ variables: { input: item } })}
+          {...props}
+        />
       )}
     </Mutation>
   )
 }
 
-export const ButtonDelete = ({ item }) => {
+export const ButtonDelete{{name}} = ({ item, ...props }) => {
   return (
     <Mutation mutation={mutationDelete{{~name~}}}>
       {({ mutate }) => (
-        <ButtonModal color='danger' title='Delete {{name}}' content='Are you sure you want to delete this {{name}}?' onComplete={() => mutate({ variables: { id: item.id } })}>
-          <i className='material-icons'>delete</i>
-        </ButtonModal>
+        <ButtonModal
+          title='Delete {{name}}'
+          content='Are you sure you want to delete this {{name}}?'
+          onComplete={() => mutate({ variables: { id: item.id } })}
+          {...props}
+        />
       )}
     </Mutation>
   )
@@ -103,8 +111,8 @@ export const List{{plural name}} = () => (
               <td>{d.{{~name.value~}}}</td>
               {{/each}}
               <td>
-                <ButtonDelete item={d} />
-                <ButtonEdit item={d} />
+                <ButtonDelete{{name}} item={d} color='danger'><i className='material-icons'>delete</i></ButtonDelete{{name}}>
+                <ButtonEdit{{name}} item={d} color='secondary'><i className='material-icons'>edit</i></ButtonEdit{{name}}>
               </td>
             </tr>
           )) }

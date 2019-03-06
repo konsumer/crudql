@@ -1,0 +1,29 @@
+# import {{name}} from "{{filename}}"
+
+type Query {
+  # Get all {{plural name}}.
+  list{{plural name}}(pageKey: String, pageSize: Int = 100): [{{name}}]!
+  
+  # Get a single {{name}}.
+  get{{name}}(id: ID!): {{name}}!
+}  
+
+type Mutation {
+  # Update an existing {{name}}.
+  update{{name}}(input: {{name}}Update!): {{name}}!
+  
+  # Create a new {{name}}.
+  create{{name}}(input: {{name}}New!): {{name}}!
+
+  # Delete a {{name}}.
+  delete{{name}}(id: ID!): {{name}}!
+}
+
+input {{name}}Update {
+  id: ID!
+  {{updateFields}}
+}
+
+input {{name}}New {
+  {{inputFields}}
+}

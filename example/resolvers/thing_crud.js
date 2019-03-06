@@ -1,4 +1,4 @@
-const { list, get, update, create, remove, reference } = require('@crudql/dynamo')
+const {list, get, update, create, remove, reference} = require('@crudql/dynamo')
 
 module.exports = {
   Query: {
