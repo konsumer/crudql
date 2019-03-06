@@ -2,9 +2,10 @@ import React from 'react'
 import gql from 'graphql-tag'
 import { Query, Mutation } from 'react-apollo'
 import { ButtonModal } from '@crudql/reactstrap'
+import { Table, ButtonGroup } from 'reactstrap'
 
 export const queryGet{{name}} = gql`
-  Get{{name}}($id: ID!){
+  query Get{{name}}($id: ID!){
     get{{name}}(id: $id) {
       {{listFields astNode.fields 3}}
     }
@@ -12,7 +13,7 @@ export const queryGet{{name}} = gql`
 `
 
 export const queryList{{plural name}} = gql`
-  List{{plural name}}{
+  query List{{plural name}}{
     list{{plural name}} {
       {{listFields astNode.fields 3}}
     }
@@ -94,30 +95,51 @@ export const ButtonDelete{{name}} = ({ item, ...props }) => {
 
 export const List{{plural name}} = () => (
   <Query query={queryList{{~plural name~}}}>
-    {({ data, loading }) => !loading && (
-      <table>
-        <thead>
-          <tr>
-            {{#each astNode.fields}}
-            <th>{{name.value}}</th>
-            {{/each}}
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {data.list{{plural name}}.map(d => (
-            <tr>
-              {{#each astNode.fields}}
-              <td>{d.{{~name.value~}}}</td>
-              {{/each}}
-              <td>
-                <ButtonDelete{{name}} item={d} color='danger'><i className='material-icons'>delete</i></ButtonDelete{{name}}>
-                <ButtonEdit{{name}} item={d} color='secondary'><i className='material-icons'>edit</i></ButtonEdit{{name}}>
-              </td>
-            </tr>
-          )) }
-        </tbody>
-      </table>
-    )}
+    {({ data, loading }) => {
+      if (loading) {
+        return <div>Loading...</div>
+      } else {
+        if (!data || !data.list{{plural name}} || !data.list{{plural name}}.length) {
+          return <div>No {{plural name}}.</div>
+        } else {
+          const onCompleteDelete = () => {
+            // you could put a redirect here or something.
+            alert('{{name}} deleted.')
+          }
+
+          const onCompleteEdit = () => {
+            // you could put a redirect here or something.
+            alert('{{name}} saved.')
+          }
+          return (
+            <Table>
+              <thead>
+                <tr>
+                  {{#each astNode.fields}}
+                  <th>{{name.value}}</th>
+                  {{/each}}
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {data.list{{plural name}}.map(d => (
+                  <tr key={d.id}>
+                    {{#each astNode.fields}}
+                    <td>{d.{{~name.value~}}}</td>
+                    {{/each}}
+                    <td>
+                      <ButtonGroup className='btn-group-fluid'>
+                        <ButtonDelete{{name}} label='Delete this {{name}}' onComplete={onCompleteDelete} item={d} outline color='danger' className='btn-sm'><i className='material-icons'>delete</i></ButtonDelete{{name}}>
+                        <ButtonEdit{{name}} label='Edit this {{name}}' onComplete={onCompleteEdit} item={d} outline color='secondary' className='btn-sm'><i className='material-icons'>edit</i></ButtonEdit{{name}}>
+                      </ButtonGroup>
+                    </td>
+                  </tr>
+                )) }
+              </tbody>
+            </Table>
+          )
+        }
+      }
+    }}
   </Query>
 )

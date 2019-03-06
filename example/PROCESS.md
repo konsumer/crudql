@@ -26,6 +26,7 @@ git clone git@github.com:konsumer/crudql.git ~/Desktop/crudql
 cp ~/Desktop/crudql/example/schema/scalars.graphql ~/Desktop/crudql/example/schema/thing.graphql ~/Desktop/crudql/example/schema/user.graphql schema/
 cp ~/Desktop/crudql/example/resolvers/scalars.js resolvers/
 cp ~/Desktop/crudql/example/server.js ~/Desktop/crudql/example/setup.js .
+cp ~/Desktop/crudql/example/components/Page.js components/
 cp -R ~/Desktop/crudql/example/pages .
 ```
 
@@ -41,6 +42,7 @@ schema/
 resolvers/
   scalars.js
 components/
+  Page.js
 pages/
   index.js
 ```

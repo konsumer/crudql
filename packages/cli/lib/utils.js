@@ -3,6 +3,7 @@ const { readFileSync } = require('fs')
 const { pluralize } = require('inflection')
 
 // return a list of fields, with indent
+// TODO: this could proably be done with join
 Handlebars.registerHelper('listFields', (fields, indent = 0) => fields.map(f => f.name.value).join(`,\n${'  '.repeat(indent)}`))
 
 // return plural of string
@@ -15,6 +16,7 @@ Handlebars.registerHelper('join', (strings, seperator) => strings.join(seperator
 const getTemplate = (file) => Handlebars.compile(readFileSync(file).toString())
 
 // get fields for a linked type (for field-resolvers)
+// TODO: this should probably be a helper
 const getLinked = type => {
   let out = []
 
@@ -34,6 +36,7 @@ const getLinked = type => {
 
 // get fields for input/update type
 // TODO: this could probly be simplified
+// TODO: this should probably be a helper
 const getInputFields = (type, passRequired) => {
   return Object.values(type._fields).filter(f => {
     const plainType = f.type.toString().replace('!', '').replace('[', '').replace(']', '')

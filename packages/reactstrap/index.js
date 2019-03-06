@@ -47,7 +47,7 @@ class ButtonModal extends Component {
     super(props)
     this.state = { open: false }
     this.onComplete = this.onComplete.bind(this)
-    this.delete = this.delete.bind(this)
+    this.toggle = this.toggle.bind(this)
   }
 
   toggle () {
@@ -62,19 +62,16 @@ class ButtonModal extends Component {
   }
 
   render () {
+    const { onComplete, title, content, showCancel, ...props } = this.props
     return (
       <Fragment>
-        <Button className={this.props.className} color={this.props.color}>
-          {this.props.children}
-        </Button>
+        <Button {...props} />
         <Modal isOpen={this.state.open} toggle={this.toggle}>
-          <ModalHeader toggle={this.toggle}>{this.props.title}</ModalHeader>
-          <ModalBody>
-            {this.props.content}
-          </ModalBody>
+          <ModalHeader toggle={this.toggle}>{title}</ModalHeader>
+          <ModalBody>{content}</ModalBody>
           <ModalFooter>
             <Button color='primary' onClick={this.onComplete}>Ok</Button>
-            <Button color='secondary' onClick={this.toggle}>Cancel</Button>
+            {showCancel && (<Button color='secondary' onClick={this.toggle}>Cancel</Button>)}
           </ModalFooter>
         </Modal>
       </Fragment>
@@ -87,8 +84,12 @@ ButtonModal.propTypes = {
   onComplete: PropTypes.function,
   title: PropTypes.string,
   content: PropTypes.node.isRequired,
-  className: PropTypes.string,
-  color: PropTypes.string
+  showCancel: PropTypes.boolean
+}
+
+ButtonModal.defaultProps = {
+  onComplete: () => {},
+  showCancel: true
 }
 
 module.exports = { Form, ButtonModal, context }
