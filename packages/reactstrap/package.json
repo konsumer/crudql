@@ -1,6 +1,6 @@
 {
   "name": "@crudql/reactstrap",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publishConfig": {
     "access": "public"
   },
@@ -13,7 +13,7 @@
   },
   "scripts": {
     "build": "babel --presets react index.js -d build/",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
